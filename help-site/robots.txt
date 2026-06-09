@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /api/help-centers/loader.js
+Allow: /api/help-centers/*/questions
+Disallow: /_next/
+Disallow: /api/
+Disallow: /public/
+Disallow: /*/conversational
+Disallow: /*/conversational/chat
+Sitemap: https://help.zimadental.nl/sitemap.xml
