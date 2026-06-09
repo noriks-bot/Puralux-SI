@@ -1,0 +1,45 @@
+<?php
+/**
+ * puralux front page.
+ *
+ * @package puralux
+ */
+
+$clone_dir   = get_template_directory()     . '/assets/puralux-clone';
+$clone_uri   = get_template_directory_uri() . '/assets/puralux-clone';
+$source_file = $clone_dir . '/site/products/dental-pod-pro.html';
+
+if ( ! file_exists( $source_file ) ) {
+    status_header( 500 );
+    echo 'Clone source missing: ' . esc_html( $source_file );
+    exit;
+}
+
+$html = file_get_contents( $source_file );
+
+$replacements = array(
+    '../../cdn-assets/'   => $clone_uri . '/cdn-assets/',
+    '../../fonts-google/' => $clone_uri . '/fonts-google/',
+    '../../fonts-static/' => $clone_uri . '/fonts-static/',
+    'https://cdn-assets/' => $clone_uri . '/cdn-assets/',
+    '"//cdn-assets/'      => '"' . $clone_uri . '/cdn-assets/',
+    '../cdn/'             => $clone_uri . '/site/cdn/',
+    '../checkouts/'       => $clone_uri . '/site/checkouts/',
+);
+
+$html = strtr( $html, $replacements );
+
+// Strip Shrine theme protection + suspicious shopify.jsdeliver.cloud loader.
+$html = preg_replace(
+    array(
+        '#\s*<link[^>]*href="https://js\.shrinetheme\.com[^"]*"[^>]*>\s*#i',
+        '#\s*<script[^>]*src="https://js\.shrinetheme\.com[^"]*"[^>]*></script>\s*#i',
+        '#\s*<script[^>]*src="https://shopify\.jsdeliver\.cloud[^"]*"[^>]*></script>\s*#i',
+    ),
+    "\n",
+    $html
+);
+
+header( 'Content-Type: text/html; charset=UTF-8' );
+echo $html;
+exit;
