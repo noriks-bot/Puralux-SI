@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Web Pixels Manager Sandbox</title>
+    <script src="https://zimadental.nl/cdn/wpm/sa9664f44w6a62cec8p04af10e4mb91e3447m.js"></script>
+
+    <script type="text/javascript">
+  (function(shopify) {shopify.extend('WebPixel::Render', function(api) {
+var analytics=api.analytics,browser=api.browser,init=api.init;
+
+    // Begin: Northbeam Events
+    // Begin: Northbeam Pixel
+      (function(){var e;(n=e=e||{}).A="identify",n.B="trackPageView",n.C="fireEmailCaptureEvent",n.D="fireCustomGoal",n.E="firePurchaseEvent",n.F="trackPageViewInitial",n.G="identifyCustomerId";var n="//j.northbeam.io/ota-sp/39f97d9d-f533-4c12-8115-31a4f57f0f3c.js";function r(n){for(var t=[],e=1;e<arguments.length;e++)t[e-1]=arguments[e];i.push({fnName:n,args:t})}var t,i=[],a=((t={})[e.F]=function(n){r(e.F,n)},(a={_q:i})[e.A]=function(n,t){return r(e.A,n,t)},a[e.B]=function(){return r(e.B)},a[e.C]=function(n,t){return r(e.C,n,t)},a[e.D]=function(n,t){return r(e.D,n,t)},a[e.E]=function(n){return r(e.E,n)},a[e.G]=function(n,t){return r(e.G,n,t)},window.Northbeam=a,document.createElement("script"));a.async=!0,a.src=n,document.head.appendChild(a),t.trackPageViewInitial(window.location.href);})()
+    // End: Northbeam Pixel
+
+    
+  // Subscription Hook
+        analytics.subscribe("checkout_completed", (event) => {
+          window.Northbeam.firePurchaseEvent({
+            id: event.data.checkout.token,
+            totalPrice: event.data.checkout.totalPrice.amount,
+            shippingPrice: event.data.checkout.shippingLine.price.amount || 0,
+            taxPrice: event.data.checkout.totalTax.amount || 0,
+            coupons: event.data.checkout.discountApplications.join(','),
+            currency: event.data.checkout.currencyCode,
+            customerId: event.data.checkout.order.customer.id,
+            lineItems: event.data.checkout.lineItems.map((li) =>{
+              return {
+                ...li,
+                productId: li.id,
+                productName: li.title,
+                variantId: li.variant.id,
+                variantName: li.variant.title || li.variant.product.title,
+                price: li.variant.price.amount,
+                quantity: li.quantity,
+              }
+            }),
+          });
+      });
+    
+
+    // End: Northbeam Events
+    
+// Step 1. Initialize the JavaScript pixel SDK (make sure to exclude HTML)
+
+
+// Step 2. Subscribe to customer events with analytics.subscribe(), and add tracking
+//  analytics.subscribe("all_standard_events", function (event) {
+//    console.log("Event data ", event?.data);
+//  });
+
+});})(self.webPixelsManager.createShopifyExtend('127467797', 'custom'));
+
+</script>
+
+  </head>
+  <body></body>
+</html>

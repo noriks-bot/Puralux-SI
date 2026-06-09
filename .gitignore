@@ -1,0 +1,13 @@
+# WP runtime
+*.log
+.DS_Store
+node_modules/
+
+# Plugin caches
+plugins/*/cache/
+plugins/*/logs/
+plugins/woocommerce/i18n/
+plugins/woocommerce/.maintenance
+
+# Don't track binary backups inside theme
+puralux/front-page.php.bak.*
