@@ -158,7 +158,7 @@ $html = preg_replace( '#<head[^>]*>#i', '$0' . str_replace( '$', '\\$', $head_st
 
 // Inject WC add-to-cart handler before </body>
 $wc_product_id = 10;
-$wc_cart_url   = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : '/cart/';
+$wc_cart_url   = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : '/checkout/';
 $wc_handler = '<script>(function(){
   var PID = ' . intval( $wc_product_id ) . ';
   var CART = ' . wp_json_encode( $wc_cart_url ) . ';
