@@ -7,7 +7,7 @@
 
 $clone_dir   = get_template_directory()     . '/assets/puralux-clone';
 $clone_uri   = get_template_directory_uri() . '/assets/puralux-clone';
-$source_file = $clone_dir . '/site/products/dental-pod-pro.html';
+$source_file = $clone_dir . '/site/products/ultrasonic-retainer-cleaner.html';
 
 if ( ! file_exists( $source_file ) ) {
     status_header( 500 );
@@ -28,6 +28,36 @@ $replacements = array(
 );
 
 $html = strtr( $html, $replacements );
+// Fix broken brand-replaced domains
+$brand_domain_map = array(
+    "//restora-paris.com/cdn/" => $clone_uri . "/site/cdn/",
+    "//soya-paris.com/cdn/"    => $clone_uri . "/site/cdn/",
+    "//puralux.local/cdn/"     => $clone_uri . "/site/cdn/",
+    "//zimadental.nl/cdn/"     => $clone_uri . "/site/cdn/",
+    "//puralux.nl/cdn/"        => $clone_uri . "/site/cdn/",
+    "//stepora.local/cdn/"     => $clone_uri . "/site/cdn/",
+    "//treatmedy.com/cdn/"     => $clone_uri . "/site/cdn/",
+    "//calmara.local/cdn/"     => $clone_uri . "/site/cdn/",
+    "//callixe.com/cdn/"       => $clone_uri . "/site/cdn/",
+    "https://restora-paris.com/cdn/" => $clone_uri . "/site/cdn/",
+    "https://soya-paris.com/cdn/"    => $clone_uri . "/site/cdn/",
+    "https://puralux.local/cdn/"     => $clone_uri . "/site/cdn/",
+    "https://zimadental.nl/cdn/"     => $clone_uri . "/site/cdn/",
+    "https://stepora.local/cdn/"     => $clone_uri . "/site/cdn/",
+    "https://treatmedy.com/cdn/"     => $clone_uri . "/site/cdn/",
+    "https://calmara.local/cdn/"     => $clone_uri . "/site/cdn/",
+    "https://callixe.com/cdn/"       => $clone_uri . "/site/cdn/",
+);
+$html = strtr( $html, $brand_domain_map );
+
+// JSON-escaped CDN refs (\/\/puralux.nl\/cdn\/ ...) — dinamicno nalozeni tvg-*.js/css + product slike
+$esc_local = str_replace( '/', '\\/', $clone_uri . '/site/cdn/' );
+$html = str_replace(
+    array( 'http:\\/\\/puralux.nl\\/cdn\\/', 'https:\\/\\/puralux.nl\\/cdn\\/', '\\/\\/puralux.nl\\/cdn\\/' ),
+    $esc_local,
+    $html
+);
+
 
 // Strip Shrine theme protection + suspicious shopify.jsdeliver.cloud loader.
 $html = preg_replace(
@@ -79,6 +109,52 @@ $html = preg_replace(
     "\n",
     $html
 );
+
+// === BORIS PATCH v2 ===
+// 1) Fix wget artefakt: %3Fv=... (percent-encoded query) zapecen v asset poti -> 404.
+//    Na disku so datoteke brez query sufiksa, zato ga odstranimo do delimiterja.
+$html = preg_replace( '#%3F[^"\'\s\)>]*#', '', $html );
+
+// 2) Odstrani inline skripte Shopify appov, ki so pokvarjene na WP klonu:
+//    - Globo FormBuilder: zmangljan JSON (syntax error "Unexpected identifier 'https'")
+//    - shop-cart-sync module: top-level import iz puralux.nl/zimadental.nl
+$html = preg_replace_callback(
+    '#<script\b([^>]*)>([\s\S]*?)</script>#i',
+    function ( $m ) {
+        if ( strpos( $m[1], 'src=' ) !== false ) {
+            return $m[0];
+        }
+        foreach ( array( 'Globo.FormBuilder', 'initShopCartSync', 'puralux.nl/cdn', 'zimadental.nl/cdn' ) as $needle ) {
+            if ( strpos( $m[2], $needle ) !== false ) {
+                return "\n";
+            }
+        }
+        return $m[0];
+    },
+    $html
+);
+// 3) Brand-rename artefakt: HTML referencira PuraLux_03..., na disku je PuraluxDental_03...
+$html = str_replace( 'PuraLux_03.02.25_0744', 'PuraluxDental_03.02.25_0744', $html );
+
+// 4) Globo stub (FormBuilder skripta odstranjena, druge skripte pa referencirajo Globo)
+//    + cart.js shim: tvg-theme-cart.js fetcha Shopify /cart.js -> preusmerimo na lokalni JSON
+$head_stub = '<script>
+window.Globo = window.Globo || {};
+window.Globo.FormBuilder = window.Globo.FormBuilder || { shop: { configuration: {} } };
+(function(){
+  var CART_JSON = {"token":"","note":null,"attributes":{},"original_total_price":0,"total_price":0,"total_discount":0,"total_weight":0,"item_count":0,"items":[],"requires_shipping":false,"currency":"EUR","items_subtotal_price":0,"cart_level_discount_applications":[]};
+  var origFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = (typeof input === "string") ? input : (input && input.url) || "";
+    if (/\/cart\.js(on)?(\?|$)/.test(url)) {
+      return Promise.resolve(new Response(JSON.stringify(CART_JSON), {status:200, headers:{"Content-Type":"application/json"}}));
+    }
+    return origFetch.apply(this, arguments);
+  };
+})();
+</script>';
+$html = preg_replace( '#<head[^>]*>#i', '$0' . str_replace( '$', '\\$', $head_stub ), $html, 1 );
+// === END BORIS PATCH v2 ===
 
 // Inject WC add-to-cart handler before </body>
 $wc_product_id = 10;
