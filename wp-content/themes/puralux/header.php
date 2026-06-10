@@ -26,7 +26,7 @@
 
 <div id="page" class="puralux-site">
 
-  <?php /* boris-hide-hf */ if ( ! ( function_exists( 'is_cart' ) && is_cart() ) ) : ?>
+  <?php /* boris-hide-hf */ if ( ! ( ( function_exists( 'is_cart' ) && is_cart() ) || ( function_exists( 'is_checkout' ) && is_checkout() ) ) ) : ?>
   <!-- Announcement bar -->
   <div class="cal-announce" role="region" aria-label="Promocije">
     <div class="cal-announce-track">
