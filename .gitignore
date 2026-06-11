@@ -1,8 +1,0 @@
-# Ignore everything in root
-/*
-!.gitignore
-!README.md
-!/wp-content/
-/wp-content/uploads/
-!/wp-content/themes/
-!/wp-content/plugins/

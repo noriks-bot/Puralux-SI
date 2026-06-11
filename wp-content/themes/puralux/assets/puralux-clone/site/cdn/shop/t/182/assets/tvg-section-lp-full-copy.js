@@ -1,5 +1,0 @@
-"use strict";/*! DO NOT EDIT: This file is auto-generated and will be overwritten. [build-fingerprint:assets] */(self.webpackChunktvg_shopify_theme=self.webpackChunktvg_shopify_theme||[]).push([["6051"],{4227:function(__unused_webpack_module,__unused_webpack___webpack_exports__,__webpack_require__){
-var _core_dom_traversal__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(6985),_core_shopify_init_section_index_js__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(1078),_snippets_countdown_timer_index_js__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(
-5959);(0,_core_shopify_init_section_index_js__WEBPACK_IMPORTED_MODULE_0__.initSection)(".js-lp-full-copy",section=>{let cleanupTimer=null;return(0,_core_dom_traversal__WEBPACK_IMPORTED_MODULE_1__.findOneElement)(section,".js-countdown-timer")&&
-(cleanupTimer=(0,_snippets_countdown_timer_index_js__WEBPACK_IMPORTED_MODULE_2__.initCountdownTimer)(section)),{unload:()=>{cleanupTimer&&cleanupTimer()}}})}},function(__webpack_require__){__webpack_require__.O(0,["8097"],function(){return __webpack_require__(
-__webpack_require__.s=4227)}),__webpack_require__.O()}]);
